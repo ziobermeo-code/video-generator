@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { VIDEO_MODELS, type VideoModel } from "@/lib/types";
+import { pickBestModel } from "@/lib/pick-best-model";
 
 interface AgentResponse {
   message: string;
@@ -8,25 +9,6 @@ interface AgentResponse {
   prompt?: string;
   aspect_ratio?: string;
   duration?: number;
-}
-
-function pickBestModel(prompt: string): VideoModel {
-  const lower = prompt.toLowerCase();
-
-  // VEO 3: best for scenes that benefit from audio, music, dialogue, nature sounds
-  const audioKeywords = ["música", "musica", "canción", "cancion", "audio", "sonido", "habla", "diálogo", "dialogo", "canta", "narración", "narracion", "voz", "sound", "music", "voice", "sing"];
-  if (audioKeywords.some((kw) => lower.includes(kw))) return "veo";
-
-  // Sora 2: best for cinematic, artistic, abstract, dreamlike content
-  const cinematicKeywords = ["cinematográfico", "cinematografico", "cinematic", "surrealista", "surreal", "artístico", "artistico", "artistic", "abstracto", "abstract", "sueño", "dream", "fantasía", "fantasia", "fantasy", "épico", "epico", "epic", "dramático", "dramatico", "dramatic"];
-  if (cinematicKeywords.some((kw) => lower.includes(kw))) return "sora";
-
-  // Kling 2.1: best for realistic scenes, camera movements, action, people
-  const realisticKeywords = ["realista", "realistic", "persona", "person", "gente", "people", "cámara", "camara", "camera", "acción", "accion", "action", "deporte", "sport", "movimiento", "movement"];
-  if (realisticKeywords.some((kw) => lower.includes(kw))) return "kling";
-
-  // Default: Kling is the most versatile
-  return "kling";
 }
 
 function parseUserIntent(message: string, selectedModel?: VideoModel): AgentResponse {
