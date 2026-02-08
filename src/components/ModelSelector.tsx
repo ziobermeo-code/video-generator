@@ -8,15 +8,21 @@ interface ModelSelectorProps {
 }
 
 const modelIcons: Record<VideoModel, string> = {
+  auto: "✨",
   kling: "🎬",
   veo: "🌟",
   sora: "🎥",
 };
 
+const allOptions: { id: VideoModel; name: string; description: string }[] = [
+  { id: "auto", name: "Auto", description: "El asistente elige el mejor modelo según tu prompt" },
+  ...VIDEO_MODELS.map((m) => ({ id: m.id, name: m.name, description: m.description })),
+];
+
 export default function ModelSelector({ selected, onSelect }: ModelSelectorProps) {
   return (
     <div className="flex gap-2">
-      {VIDEO_MODELS.map((model) => (
+      {allOptions.map((model) => (
         <button
           key={model.id}
           onClick={() => onSelect(model.id)}

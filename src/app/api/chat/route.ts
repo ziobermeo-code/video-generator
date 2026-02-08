@@ -10,10 +10,29 @@ interface AgentResponse {
   duration?: number;
 }
 
-function parseUserIntent(message: string): AgentResponse {
+function pickBestModel(prompt: string): VideoModel {
+  const lower = prompt.toLowerCase();
+
+  // VEO 3: best for scenes that benefit from audio, music, dialogue, nature sounds
+  const audioKeywords = ["música", "musica", "canción", "cancion", "audio", "sonido", "habla", "diálogo", "dialogo", "canta", "narración", "narracion", "voz", "sound", "music", "voice", "sing"];
+  if (audioKeywords.some((kw) => lower.includes(kw))) return "veo";
+
+  // Sora 2: best for cinematic, artistic, abstract, dreamlike content
+  const cinematicKeywords = ["cinematográfico", "cinematografico", "cinematic", "surrealista", "surreal", "artístico", "artistico", "artistic", "abstracto", "abstract", "sueño", "dream", "fantasía", "fantasia", "fantasy", "épico", "epico", "epic", "dramático", "dramatico", "dramatic"];
+  if (cinematicKeywords.some((kw) => lower.includes(kw))) return "sora";
+
+  // Kling 2.1: best for realistic scenes, camera movements, action, people
+  const realisticKeywords = ["realista", "realistic", "persona", "person", "gente", "people", "cámara", "camara", "camera", "acción", "accion", "action", "deporte", "sport", "movimiento", "movement"];
+  if (realisticKeywords.some((kw) => lower.includes(kw))) return "kling";
+
+  // Default: Kling is the most versatile
+  return "kling";
+}
+
+function parseUserIntent(message: string, selectedModel?: VideoModel): AgentResponse {
   const lowerMsg = message.toLowerCase();
 
-  // Detect model selection
+  // Detect model selection from message text
   let detectedModel: VideoModel | undefined;
   if (lowerMsg.includes("kling")) detectedModel = "kling";
   else if (lowerMsg.includes("veo")) detectedModel = "veo";
@@ -98,7 +117,9 @@ function parseUserIntent(message: string): AgentResponse {
     }
 
     if (!detectedModel) {
-      detectedModel = "kling"; // Default model
+      detectedModel = (!selectedModel || selectedModel === "auto")
+        ? pickBestModel(videoPrompt)
+        : selectedModel;
     }
 
     const modelConfig = VIDEO_MODELS.find((m) => m.id === detectedModel);
@@ -130,7 +151,7 @@ function parseUserIntent(message: string): AgentResponse {
 
 export async function POST(request: NextRequest) {
   try {
-    const { message } = await request.json();
+    const { message, model } = await request.json();
 
     if (!message) {
       return NextResponse.json(
@@ -139,7 +160,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const response = parseUserIntent(message);
+    const response = parseUserIntent(message, model);
 
     return NextResponse.json(response);
   } catch (error) {

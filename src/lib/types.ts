@@ -1,4 +1,4 @@
-export type VideoModel = "kling" | "veo" | "sora";
+export type VideoModel = "auto" | "kling" | "veo" | "sora";
 
 export interface VideoModelConfig {
   id: VideoModel;

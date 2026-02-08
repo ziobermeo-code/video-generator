@@ -18,16 +18,17 @@ export default function Chat({ onVideoGenerated }: ChatProps) {
       content:
         "👋 ¡Hola! Soy tu asistente de generación de vídeos con IA.\n\n" +
         "Puedo crear vídeos usando estos modelos:\n\n" +
+        "✨ **Auto** — Yo elijo el mejor modelo según tu descripción\n" +
         "🎬 **Kling 2.1** — Vídeos de alta calidad con movimientos de cámara precisos\n" +
         "🌟 **VEO 3** — Modelo de Google con audio nativo profesional\n" +
         "🎥 **Sora 2** — Modelo de OpenAI con detalle cinematográfico\n\n" +
-        "Selecciona un modelo arriba y escribe tu prompt, o simplemente dime qué vídeo quieres crear.",
+        "Simplemente dime qué vídeo quieres crear y yo me encargo de elegir el mejor modelo.",
       created_at: new Date().toISOString(),
     },
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedModel, setSelectedModel] = useState<VideoModel>("kling");
+  const [selectedModel, setSelectedModel] = useState<VideoModel>("auto");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
