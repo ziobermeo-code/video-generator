@@ -30,6 +30,15 @@ export default function Home() {
     fetchVideos();
   }, [fetchVideos]);
 
+  // Poll for processing videos every 5 seconds
+  useEffect(() => {
+    const hasProcessing = videos.some((v) => v.status === "processing");
+    if (!hasProcessing) return;
+
+    const interval = setInterval(fetchVideos, 5000);
+    return () => clearInterval(interval);
+  }, [videos, fetchVideos]);
+
   const handleVideoGenerated = (video: Video) => {
     setVideos((prev) => [video, ...prev]);
   };
